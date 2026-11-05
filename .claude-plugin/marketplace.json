@@ -1,0 +1,12 @@
+{
+  "name": "ink-mist",
+  "description": "墨嵐記憶相關的 Claude Code 插件",
+  "owner": { "name": "威立" },
+  "plugins": [
+    {
+      "name": "ink-mist-memory",
+      "source": "./",
+      "description": "墨嵐記憶自動注入"
+    }
+  ]
+}

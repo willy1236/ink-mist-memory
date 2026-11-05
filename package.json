@@ -1,0 +1,40 @@
+{
+  "name": "ink-mist-memory",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "description": "墨嵐記憶自動注入：agent hook 的比對器",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && node scripts/prune-dist.mjs && node scripts/bundle-handlers.mjs",
+    "test": "vitest run",
+    "lint": "eslint ."
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "^11.4.0",
+      "onFail": "download"
+    }
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/mdast": "^4.0.4",
+    "@types/node": "^22.20.5",
+    "esbuild": "^0.25.0",
+    "eslint": "^10.14.0",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.72.1",
+    "vitest": "^5.1.0"
+  },
+  "dependencies": {
+    "mdast-util-from-markdown": "^2.1.0",
+    "mdast-util-gfm-table": "^2.0.1",
+    "mdast-util-to-string": "^4.0.0",
+    "micromark-extension-gfm-table": "^2.1.2",
+    "yaml": "^2.9.1"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact|fork",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node <repo 路徑>/dist/hook.js --memory-root <記憶庫路徑>",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node <repo 路徑>/dist/hook.js --memory-root <記憶庫路徑>",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

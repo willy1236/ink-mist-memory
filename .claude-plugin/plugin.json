@@ -1,0 +1,14 @@
+{
+  "name": "ink-mist-memory",
+  "version": "0.1.0",
+  "description": "墨嵐記憶自動注入：session 開始時注入必載檔，送出提示時注入相關記憶條目",
+  "author": { "name": "威立" },
+  "userConfig": {
+    "memory_root": {
+      "type": "directory",
+      "title": "記憶庫路徑",
+      "description": "墨嵐記憶庫根目錄（含 AGENTS.md），例如 ~/memory",
+      "required": true
+    }
+  }
+}
