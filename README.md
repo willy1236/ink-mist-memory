@@ -134,13 +134,6 @@ pnpm test   # vitest
 pnpm lint   # ESLint
 ```
 
-## 文件
-
-開發過程的規格書與任務卡，記錄當時的設計決策與驗收過程，其中路徑與專案名稱已換成範例。
-
-- 規格：`docs/specs/memory-injection.md`
-- 任務卡與實作決定：`docs/tickets/memory-injection.md`
-
 ## 程式結構
 
 比對核心與平台無關，各 agent 平台只差在 hook 的輸入輸出格式，由 `src/platforms/` 下的轉接層處理：
