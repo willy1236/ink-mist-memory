@@ -1,9 +1,9 @@
 # ink-mist-memory
 
-墨嵐記憶庫的自動注入器：記憶庫是一個 markdown 資料夾，格式見〈記憶庫格式〉。Claude Code 開 session 或送出提示時，由 hook 把相關記憶直接放進 context，agent 不必自己去讀記憶庫。
+墨嵐記憶庫的自動注入器：記憶庫是一個 markdown 資料夾，格式見〈記憶庫格式〉。Claude Code 或 Codex 開 session 或送出提示時，由 hook 把相關記憶直接放進 context，agent 不必自己去讀記憶庫。
 
 ```
-Claude Code ──hook──▶ node dist/hook.js --memory-root <記憶庫>
+Claude Code / Codex ──hook──▶ node dist/hook.js --platform <平台> --memory-root <記憶庫路徑>
                         ├─ SessionStart：preferences.md、conduct.md 全文＋讀取通則，resume 以外重置該 session 的去重
                         └─ UserPromptSubmit：依工作目錄、名稱與 alias、任務類型關鍵字挑出記憶條目
                            同一 session 去重；每次至多 30 條、10,000 字元；完全沒命中時注入一次精簡索引
@@ -111,14 +111,56 @@ repo 根目錄本身就是插件，也是只含這個插件的 marketplace（`.c
 ```
 
 - `--memory-root`：記憶庫路徑。無法在 hook 指令帶參數時改設環境變數 `INK_MIST_MEMORY_ROOT`；兩者都有時以參數為準，都沒有時注入「記憶庫路徑未設定」的失敗通知。
-- `--platform`：hook 來自哪個 agent 平台，決定輸入欄位、事件名與輸出格式，未指定時為 `claude-code`（目前唯一支援的平台）。
+- `--platform` 用來選擇 hook 平台，支援 `claude-code` 和 `codex`，預設為 `claude-code`。
 - `timeout` 要大於 3 秒，讓程式自己的逾時先生效。
 - session 去重狀態放在 `%LOCALAPPDATA%/ink-mist-memory/sessions/`，可用環境變數 `INK_MIST_SESSION_DIR` 改位置。
 - 記憶庫的解析結果快取在 `%LOCALAPPDATA%/ink-mist-memory/cache/`，記憶檔、`AGENTS.md` 或程式本身變動時自動重新解析；可用環境變數 `INK_MIST_CACHE_DIR` 改位置。
 
 只想在單一 session 試用時，把上面兩組放進另一個檔案，以 `claude --settings <檔案>` 啟動，範例見 `settings/claude-test.settings.json`，路徑需換成自己的。
 
-讀取交給 hook 之後，全域指示 `~/.claude/CLAUDE.md` 只需要告訴 agent 何時寫入記憶、寫入前先讀 `AGENTS.md`。還沒接 hook 的 agent（Codex、pi、Antigravity、Copilot）則在全域指示裡要求開工時照 `AGENTS.legacy-read.md` 自行讀記憶。
+讀取交給 hook 之後，全域指示 `~/.claude/CLAUDE.md` 只需要告訴 agent 何時寫入記憶、寫入前先讀 `AGENTS.md`。
+
+## 接上 Codex
+
+執行 `pnpm build`，再把下列兩組加到 `~/.codex/hooks.json` 的 `hooks`。若有設定 `CODEX_HOME`，使用該資料夾下的 `hooks.json`。把佔位符換成絕對路徑，Windows 路徑可使用 `/`。
+
+```json
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "^(startup|resume|clear|compact|fork)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"<repo 路徑>/dist/hook.js\" --platform codex --memory-root \"<記憶庫路徑>\"",
+            "timeout": 10,
+            "additionalContextLimit": 30000
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"<repo 路徑>/dist/hook.js\" --platform codex --memory-root \"<記憶庫路徑>\"",
+            "timeout": 10,
+            "additionalContextLimit": 30000
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+Codex 預設啟用 hooks。啟動 Codex CLI 後，開啟 `/hooks`，確認兩個 hook 的指令並標為信任，再開新 session 驗證 `SessionStart`。修改 hook 定義後需重新信任。[Codex hooks 官方文件](https://learn.chatgpt.com/docs/hooks)
+
+Codex 預設在約 2,500 tokens 後改送預覽。範例提高每個 handler 的 `additionalContextLimit`，替最多 10,000 字元的提示注入保留中文所需的 token 空間。`SessionStart` 會送出必載內容全文，若超過設定門檻，Codex 仍會改送預覽。
+
+還沒安裝 hook 的 agent 可在全域指示裡要求開工時照 `AGENTS.legacy-read.md` 自行讀記憶。
 
 ## 手動測試
 
