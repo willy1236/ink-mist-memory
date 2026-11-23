@@ -9,7 +9,7 @@ Claude Code ──hook──▶ node dist/hook.js --memory-root <記憶庫>
                            同一 session 去重；每次至多 30 條、10,000 字元；完全沒命中時注入一次精簡索引
 ```
 
-比對只看使用者實際輸入，subagent 回報、背景任務通知、Orca 訊息與 Orca 派工的開場說明不觸發注入。帶 `repos` 的專案檔，其任務類型條目只在工作目錄屬於該專案時注入。
+比對只看使用者實際輸入：subagent 回報、背景任務通知、Orca 訊息與系統提示、Claude Code 的 hook 失敗回報不觸發注入；Orca 派工的任務內容由 coordinator 撰寫，只依工作目錄比對；網址不參與比對。帶 `repos` 的專案檔，其任務類型條目只在工作目錄屬於該專案時注入。
 
 注入出錯、崩潰或超過 3 秒時，改為輸出失敗通知，請 agent 照 `AGENTS.legacy-read.md` 自己讀記憶。每次呼叫都在 `<記憶庫>/_injection-log/` 寫一筆紀錄。
 

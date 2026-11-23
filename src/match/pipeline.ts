@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import type { Entry, Memory, MemoryFile } from '../memory/index.js';
 import type { HandlerContext, HandlerResult, InjectedEntry } from '../shell/types.js';
 import type { Signal } from './types.js';
-import { userInput } from './user-input.js';
+import { matchText } from './user-input.js';
 
 /**
  * 寫成 `../match/signals/`：本檔在 dist/match/ 直接執行，或被打包進 dist/handlers/ 的處理函式時，
@@ -82,11 +82,11 @@ export function buildIndex(memory: Memory): string {
  * 送出提示的管線：各訊號產出命中條目 → 同一條目取最高優先序 → 去掉本 session 已注入 →
  * 依「訊號優先序、檔案 version 新到舊（缺的排最後，相同依路徑字母序）、檔內順序」排序。
  * 完全沒命中且本 session 未注入過索引時回傳精簡索引。截斷與記去重由外殼負責。
- * 訊號只看使用者實際輸入；整段都是機器訊息的提示不比對、不注入。
+ * 訊號只看 `matchText` 取出的文字；整段都是機器訊息的提示不比對、不注入。
  */
 export function runPipeline(rawCtx: HandlerContext, memory: Memory, signals: readonly Signal[]): HandlerResult {
   const notes = [...memory.notes];
-  const prompt = userInput(rawCtx.prompt ?? '');
+  const prompt = matchText(rawCtx.prompt ?? '');
   if (prompt === null) {
     return { sections: [], candidates: [], isIndex: false, notes: [...notes, '提示不含使用者輸入，略過比對'] };
   }
