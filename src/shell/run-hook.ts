@@ -90,6 +90,22 @@ export async function runHook(
   const failures: string[] = [];
   const isSessionStart = input.event === 'session-start';
 
+  if (input.skip !== undefined) {
+    const record: LogRecord = {
+      time: new Date().toISOString(),
+      event: input.nativeEvent ?? input.event ?? '',
+      session_id: input.sessionId,
+      cwd: input.cwd,
+      ...(input.source !== undefined && { source: input.source }),
+      entries: [],
+      index: false,
+      notes: [input.skip],
+      duration_ms: Date.now() - startedAt,
+    };
+    writeLog(memoryRoot, record);
+    return { record };
+  }
+
   const state = sessionState(input.sessionId, sessionDir);
   // resume 還原完整對話，之前注入的內容仍在 context，去重要延續
   if (isSessionStart && input.source !== 'resume') {

@@ -7,6 +7,7 @@
  * - Orca bot 首次執行的說明：`[Orca: you are in your first run…]` 加其後的 `## First run` 列表
  * - 單行的 `[Orca: …]` 提示，以及 Orca 自動送出的單行事件（重啟續作、首次執行開始、卡片回覆、Google 設定）
  * - Claude Code 的 hook 失敗回報：到提示結尾都算
+ * - Codex 內建記憶功能派出的整理 agent（`## Memory Writing Agent: Phase N`）：整段都是 Codex 產生的指示與對話摘要
  */
 const MACHINE_BLOCK = new RegExp(
   '^\\s*(?:' +
@@ -19,6 +20,7 @@ const MACHINE_BLOCK = new RegExp(
       String.raw`\[Orca: [^\n]*\][ \t]*(?:\n|$)`,
       String.raw`(?:Orca restarted\. Resume the original unfinished user task|Orca: you were just created\.|Card \S+ answered:|Google setup started by your owner)[^\n]*(?:\n|$)`,
       String.raw`Claude \w+(?::\w+)? hook failed \(exit code \d+\)[\s\S]*`,
+      String.raw`## Memory Writing Agent: Phase \d+\b[\s\S]*`,
     ].join('|') +
     ')',
 );

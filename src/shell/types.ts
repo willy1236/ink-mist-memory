@@ -12,6 +12,8 @@ export interface HookInput {
   prompt?: string;
   /** session 開始的來源；`resume` 代表接續完整對話，去重狀態延續。 */
   source?: string;
+  /** 不是使用者的 session（如 agent 內建功能派出的內部 agent）時的原因；有值時整次不注入，只寫紀錄。 */
+  skip?: string;
 }
 
 /** 一條要注入的記憶條目。`signal` 為命中訊號名稱。 */

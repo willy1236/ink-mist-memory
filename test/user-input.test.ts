@@ -46,6 +46,14 @@ const SOUL = [
 ].join('\n');
 const HOOK_FAILED =
   'Claude SessionStart:startup hook failed (exit code 127): impeccable: no engine binary\r\nDownload from https://example.com';
+const CODEX_MEMORY_AGENT = [
+  '## Memory Writing Agent: Phase 2 (Consolidation)',
+  '',
+  'You are a Memory Writing Agent.',
+  '',
+  '- rollout_summaries/shark-fix.md',
+  '  - 修好 XingyuBot 的 shark 指令',
+].join('\n');
 const ORCA = `──── From: TERM_A (term_a) [HIGH] (escalation) ────\nSubject: x\nshark 內容\n[Reply: orca]\n${RULE}`;
 
 describe('matchText', () => {
@@ -64,6 +72,7 @@ describe('matchText', () => {
     ['Orca 重啟續作', 'Orca restarted. Resume the original unfinished user task with existing commitments and authorization.'],
     ['Orca 卡片回覆', `${ORCA_HINT}\n\nCard google-setup/step answered: done, client`],
     ['Claude Code hook 失敗回報', HOOK_FAILED],
+    ['Codex 記憶整理 agent', CODEX_MEMORY_AGENT],
   ])('整段都是機器訊息時回傳 null：%s', (_name, prompt) => {
     expect(matchText(prompt)).toBeNull();
   });

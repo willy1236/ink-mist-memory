@@ -90,6 +90,40 @@ describe('--platform', () => {
     });
   });
 
+  it.each([
+    ['SessionStart', { hook_event_name: 'SessionStart', source: 'startup' }],
+    ['UserPromptSubmit', { hook_event_name: 'UserPromptSubmit', prompt: '## Memory Writing Agent: Phase 2 (Consolidation)' }],
+  ])('Codex 記憶整理 agent 不注入，只寫紀錄：%s', async (event, fields) => {
+    const codexHome = tempDir();
+    const root = memoryStore({
+      'AGENTS.md': '# 共享記憶\n\n## 讀取通則\n\n通則\n',
+      'preferences.md': '---\nname: preferences\ndescription: 偏好\nversion: 2026-01-01T00:00:00Z\n---\n\n- [stated] 正體中文\n',
+    });
+    const input = JSON.stringify({ ...codexInput, ...fields, cwd: `${codexHome}/memories` });
+    const r = await runCli(input, ['--platform', 'codex', '--memory-root', root], {
+      CODEX_HOME: codexHome,
+      INK_MIST_SESSION_DIR: tempDir(),
+      INK_MIST_CACHE_DIR: tempDir(),
+    });
+    expect(r.code).toBe(0);
+    expect(r.stdout).toBe('');
+    expect(readLogs(root)[0]).toMatchObject({ event, entries: [], notes: ['Codex 記憶整理 agent，不注入'] });
+  });
+
+  it('Codex 記憶資料夾以外的工作目錄照常處理', () => {
+    const prev = process.env.CODEX_HOME;
+    process.env.CODEX_HOME = 'D:/codex-home';
+    try {
+      expect(codex.readInput({ ...codexPrompt, cwd: 'D:\\Codex-Home\\memories_v2\\skills' }).skip).toBeDefined();
+      expect(codex.readInput({ ...codexPrompt, cwd: 'D:/codex-home/memories-old' }).skip).toBeUndefined();
+      expect(codex.readInput({ ...codexPrompt, cwd: 'D:/codex-home' }).skip).toBeUndefined();
+      expect(claudeCode.readInput({ ...codexPrompt, cwd: 'D:/codex-home/memories' }).skip).toBeUndefined();
+    } finally {
+      if (prev === undefined) delete process.env.CODEX_HOME;
+      else process.env.CODEX_HOME = prev;
+    }
+  });
+
   it('不支援的平台輸出失敗通知並寫紀錄', async () => {
     const root = memoryStore({ 'AGENTS.md': '# x\n' });
     const input = JSON.stringify({ hook_event_name: 'UserPromptSubmit', session_id: 's', cwd: 'D:/a', prompt: 'p' });

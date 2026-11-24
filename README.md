@@ -158,6 +158,8 @@ repo 根目錄本身就是插件，也是只含這個插件的 marketplace（`.c
 
 Codex 預設啟用 hooks。啟動 Codex CLI 後，開啟 `/hooks`，確認兩個 hook 的指令並標為信任，再開新 session 驗證 `SessionStart`。修改 hook 定義後需重新信任。[Codex hooks 官方文件](https://learn.chatgpt.com/docs/hooks)
 
+開啟 Codex 內建記憶功能（`[features] memories = true`）時，Codex 會在記憶資料夾（`$CODEX_HOME/memories` 或 `memories_v2`）派出整理 agent；工作目錄在這兩個資料夾內的 session 不注入，紀錄的 `notes` 會標明略過原因。
+
 Codex 預設在約 2,500 tokens 後改送預覽。範例提高每個 handler 的 `additionalContextLimit`，替最多 10,000 字元的提示注入保留中文所需的 token 空間。`SessionStart` 會送出必載內容全文，若超過設定門檻，Codex 仍會改送預覽。
 
 還沒安裝 hook 的 agent 可在全域指示裡要求開工時照 `AGENTS.legacy-read.md` 自行讀記憶。
